@@ -85,10 +85,13 @@ void setup() {
   // Enter network credentials:
 ssid     = SIData.SSID;
 password = SIData.Password;
-url = String("/macros/s/") + GScriptId + "/exec";
 
 // Enter Google Script Deployment ID:
 GScriptId = SIData.gScriptID;
+
+url = String("/macros/s/") + GScriptId + "/exec";
+
+
   SPI.begin(); // Init SPI bus
   rfid.PCD_Init(); // Init MFRC522 
 
