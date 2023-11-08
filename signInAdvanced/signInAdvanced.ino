@@ -1,3 +1,9 @@
+#include <SignInData.h>
+
+
+
+
+
 // Example Arduino/ESP8266 code to upload data to Google Sheets when a button is pressed
 // Follow setup instructions found here:
 // https://github.com/StorageB/Google-Sheets-Logging
@@ -11,6 +17,7 @@
 #include <ESP8266WiFi.h>
 #include "HTTPSRedirect.h"
 #include <ArduinoJson.h>
+//#include "SignInData.h"
 
 //Libraries for display
 #include <Wire.h>
@@ -27,13 +34,15 @@
 //Set display to D1 for clock and D2 for data
 U8G2_SSD1306_128X64_NONAME_1_SW_I2C u8g2(U8G2_R0, /* clock=*/ D1, /* data=*/ D2, /* reset=*/ U8X8_PIN_NONE);   // All Boards without Reset of the Display
 
+
+SignInData SIData;
 // Enter network credentials:
-const char* ssid     = "Guest";
-const char* password = "";
+const char* ssid;
+const char* password;
 
 
 // Enter Google Script Deployment ID:
-const char *GScriptId = "AKfycbw5dHMd7jBbPj_JlCvhZole4216Xx135nQOAFZrb6n2AWDTiCZbs1Knv35658X_cLlM";
+const char* GScriptId;
 
 // Enter command (insert_row or append_row) and your Google Sheets sheet name (default is Sheet1):
 String payload_base =  "{\"command\": \"insert_row\", \"sheet_name\": \"Sheet1\", \"values\": ";
@@ -43,7 +52,7 @@ String payload = "";
 const char* host = "script.google.com";
 const int httpsPort = 443;
 const char* fingerprint = "";
-String url = String("/macros/s/") + GScriptId + "/exec";
+String url;
 HTTPSRedirect* client = nullptr;
 
 // Declare variables that will be published to Google Sheets
@@ -72,7 +81,14 @@ byte nuidPICC[4];
 int loopCount = 0;
 
 void setup() {
+  SIData.init();
+  // Enter network credentials:
+ssid     = SIData.SSID;
+password = SIData.Password;
+url = String("/macros/s/") + GScriptId + "/exec";
 
+// Enter Google Script Deployment ID:
+GScriptId = SIData.gScriptID;
   SPI.begin(); // Init SPI bus
   rfid.PCD_Init(); // Init MFRC522 
 
