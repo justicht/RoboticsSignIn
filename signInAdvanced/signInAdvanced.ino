@@ -81,7 +81,7 @@ byte nuidPICC[4];
 int loopCount = 0;
 
 void setup() {
-  SIData.init();
+  
   // Enter network credentials:
 ssid     = SIData.SSID;
 password = SIData.Password;
