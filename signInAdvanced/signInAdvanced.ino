@@ -1,4 +1,4 @@
-#include <SignInData.h>
+
 
 
 
@@ -17,7 +17,7 @@
 #include <ESP8266WiFi.h>
 #include "HTTPSRedirect.h"
 #include <ArduinoJson.h>
-//#include "SignInData.h"
+#include <SignInData.h>
 
 //Libraries for display
 #include <Wire.h>
@@ -39,6 +39,9 @@ SignInData SIData;
 // Enter network credentials:
 const char* ssid;
 const char* password;
+const char* ssid2;
+const char* password2;
+int tryCounter = 0;
 
 
 // Enter Google Script Deployment ID:
@@ -85,6 +88,9 @@ void setup() {
   // Enter network credentials:
 ssid     = SIData.SSID;
 password = SIData.Password;
+ssid2 = SIData.SSID2;
+password2 = SIData.Password2;
+tryCounter = 0;
 
 // Enter Google Script Deployment ID:
 GScriptId = SIData.gScriptID;
@@ -106,16 +112,8 @@ url = String("/macros/s/") + GScriptId + "/exec";
   Serial.println('\n');
   
   
-  // Connect to WiFi
-  WiFi.begin(ssid, password);             
-  Serial.print("Connecting to ");
-  Serial.print(ssid); Serial.println(" ...");
-  printDisplay("Connecting to",ssid,"");
+  internetConnect();
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
   Serial.println('\n');
   Serial.println("Connection established!");  
   Serial.print("IP address:\t");
@@ -170,6 +168,12 @@ void loop() {
      loopCount = 0;
     }
     
+
+    //printDisplay(String(WiFi.RSSI()),String(WiFi.status()),"");
+    while(WiFi.status() != WL_CONNECTED){
+      printDisplay("Please Hold","internet lost","");
+      internetConnect();
+    }
   //End the loop if a card is not present
   if ( ! rfid.PICC_IsNewCardPresent())
     return;
@@ -213,7 +217,7 @@ void loop() {
       value2 = 0;
 
     // the while loop will attempt to publish data up to 3 times
-    while(data_published == false && error_count < 3){
+    while(data_published == false && error_count < 6){
 
       static bool flag = false;
       if (!flag){
@@ -267,7 +271,7 @@ void loop() {
 
        printDisplay("Error", "while","connecting");
        error_count++;
-       delay(2000);
+       delay(1000);
       }
       yield();
     } 
@@ -280,6 +284,30 @@ void loop() {
   rfid.PCD_StopCrypto1();
 }
 
+void internetConnect(){
+// Connect to WiFi
+  WiFi.begin(ssid, password);             
+  Serial.print("Connecting to ");
+  Serial.print(ssid); Serial.println(" ...");
+  printDisplay("Connecting to",ssid,"");
+
+  while (WiFi.status() != WL_CONNECTED && tryCounter < 10) {
+    delay(1000);
+    Serial.print(".");
+    tryCounter++;
+  }
+if(WiFi.status() != WL_CONNECTED){
+  WiFi.begin(ssid2, password2);             
+  Serial.print("Connecting to ");
+  Serial.print(ssid2); Serial.println(" ...");
+  printDisplay("NVM, Connecting to",ssid2,"");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+}
+}
 
 void printDisplay(String line1, String line2, String line3){
   

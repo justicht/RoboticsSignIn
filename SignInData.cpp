@@ -10,7 +10,7 @@
 #include "SignInData.h"
 #include "Arduino.h"
 
-const char* _SSID = "ssid";
+const char* _SSID = "said";
 const char* _Password = "abc213";
 const char* _gScriptID = "";
 
